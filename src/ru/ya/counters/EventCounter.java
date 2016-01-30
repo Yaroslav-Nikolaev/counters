@@ -2,7 +2,7 @@ package ru.ya.counters;
 
 public interface EventCounter<T extends CountedEvent> {
 
-    void count(T event);
+    void countEvent(T event);
 
     long getQuantityOfEventsInTheLastMinute();
 

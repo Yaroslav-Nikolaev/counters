@@ -1,44 +1,56 @@
 package ru.ya.counters.concurrent;
 
-import ru.ya.counters.EventCounter;
 import ru.ya.counters.CountedEvent;
+import ru.ya.counters.EventCounter;
 
 import java.util.Deque;
-import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 
 /**
- *
+ * The implementation of {@link EventCounter}, which use series of counting results splitted by time.
+ * This implementation suggests granularity of data, hence error in an accurate result.
  * @param <T>
  */
 public abstract class SeriesEventCounter<T extends CountedEvent> implements EventCounter<T> {
-    //in real application the executor won't be here.
-    private final ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
-    private final Deque<Long> countSeries = new LinkedBlockingDeque<>((int) TimeUnit.DAYS.toSeconds(1));
+    private final static int SINGLE_TIME_UNIT = 1;
+    private final static TimeUnit DEFAULT_GRANULATION = TimeUnit.SECONDS;
 
-    public SeriesEventCounter() {
-        executorService.scheduleAtFixedRate(new Refresher(), 0, 1, TimeUnit.SECONDS);
+    private final Deque<Long> countSeries = new LinkedBlockingDeque<>((int) TimeUnit.DAYS.toSeconds(1));
+    private final TimeUnit activeTimeUnit;
+    private final int activeInterval;
+
+
+    public SeriesEventCounter(ScheduledExecutorService executorService) {
+        this(executorService, DEFAULT_GRANULATION, SINGLE_TIME_UNIT);
+    }
+
+    //todo realize ability to change granularity in future(during task in doesn't need)
+    private SeriesEventCounter(ScheduledExecutorService executorService, TimeUnit unit, int interval) {
+        activeTimeUnit = unit;
+        activeInterval = interval;
+        executorService.scheduleAtFixedRate(new CounterSlicer(), 0, interval, unit);
     }
 
     @Override
     public long getQuantityOfEventsInTheLastMinute() {
-        return getQuantityOfEventsInInterval(TimeUnit.MINUTES, 1);
+        return getQuantityOfEventsInTheLastInterval(TimeUnit.MINUTES, SINGLE_TIME_UNIT);
     }
 
     @Override
     public long getQuantityOfEventsInTheLastHour() {
-        return getQuantityOfEventsInInterval(TimeUnit.HOURS, 1);
+        return getQuantityOfEventsInTheLastInterval(TimeUnit.HOURS, SINGLE_TIME_UNIT);
     }
 
     @Override
     public long getQuantityOfEventsInTheLastDay() {
-        return getQuantityOfEventsInInterval(TimeUnit.DAYS, 1);
+        return getQuantityOfEventsInTheLastInterval(TimeUnit.DAYS, SINGLE_TIME_UNIT);
     }
 
-    private long getQuantityOfEventsInInterval(TimeUnit unit, int interval) {
+    //todo range method in future (during task in doesn't need)
+    protected long getQuantityOfEventsInTheLastInterval(TimeUnit unit, int interval) {
         long historyLength = unit.toSeconds(interval);
         return countSeries.stream().limit(historyLength).reduce(0l, (sum, element) -> sum + element, (sum1, sum2) -> sum1 + sum2);
     }
@@ -54,7 +66,7 @@ public abstract class SeriesEventCounter<T extends CountedEvent> implements Even
     protected abstract Long getQuantityInPeriod();
 
 
-    private class Refresher implements Runnable {
+    private class CounterSlicer implements Runnable {
 
         @Override
         public void run() {

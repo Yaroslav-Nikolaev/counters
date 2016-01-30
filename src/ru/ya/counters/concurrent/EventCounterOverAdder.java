@@ -2,13 +2,24 @@ package ru.ya.counters.concurrent;
 
 import ru.ya.counters.CountedEvent;
 
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.LongAdder;
 
-public class EventCounterOverAdder extends SeriesEventCounter<CountedEvent> {
+/**
+ * This implementation suggests that write will be more often operation than reads.
+ *
+ * @param <T>
+ */
+public class EventCounterOverAdder<T extends CountedEvent> extends SeriesEventCounter<T> {
     private final LongAdder counter = new LongAdder();
 
+    public EventCounterOverAdder(ScheduledExecutorService executorService) {
+        super(executorService);
+    }
+
     @Override
-    public void count(CountedEvent countedEvent) {
+    public void countEvent(CountedEvent countedEvent) {
         counter.increment();
     }
 
