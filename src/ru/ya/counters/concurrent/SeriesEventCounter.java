@@ -55,7 +55,7 @@ public abstract class SeriesEventCounter<T extends CountedEvent> implements Even
         return quantityOfEventsInTheLastDay;
     }
 
-    protected long getQuantityOfEventsInTheLastInterval(TimeUnit unit, int interval) {
+    protected final long getQuantityOfEventsInTheLastInterval(TimeUnit unit, int interval) {
         long historyLength = unit.toSeconds(interval);
         return countSeries.stream().limit(historyLength).reduce(0l, (sum, element) -> sum + element, (sum1, sum2) -> sum1 + sum2);
     }

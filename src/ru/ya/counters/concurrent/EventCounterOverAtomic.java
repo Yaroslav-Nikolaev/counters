@@ -3,29 +3,29 @@ package ru.ya.counters.concurrent;
 import ru.ya.counters.CountedEvent;
 
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicLong;
 
 /**
- * This implementation suggests that write will be more often operation than reads.
+ * More accurate implementation of {@link ru.ya.counters.concurrent.WeekEventCounterOverAtomic}
+ * which decrease an error in results.
  * @param <T>
  */
-public class EventCounterOverAtomic<T extends CountedEvent> extends SeriesEventCounter<T> {
-    private final static long ZERO = 0;
-
+public class EventCounterOverAtomic<T extends CountedEvent> extends WeekEventCounterOverAtomic<T> {
     public EventCounterOverAtomic(ScheduledExecutorService executorService) {
         super(executorService);
     }
 
-    private final AtomicLong counter = new AtomicLong(0);
-
     @Override
-    protected Long getQuantityInPeriodAndReset() {
-        return counter.getAndSet(ZERO);
+    public long getQuantityOfEventsInTheLastMinute() {
+        return super.getQuantityOfEventsInTheLastMinute() + getQuantityInThisMoment();
     }
 
     @Override
-    public void countEvent(CountedEvent countedEvent) {
-        counter.incrementAndGet();
+    public long getQuantityOfEventsInTheLastHour() {
+        return super.getQuantityOfEventsInTheLastHour() + getQuantityInThisMoment();
+    }
+
+    @Override
+    public long getQuantityOfEventsInTheLastDay() {
+        return super.getQuantityOfEventsInTheLastDay() + getQuantityInThisMoment();
     }
 }

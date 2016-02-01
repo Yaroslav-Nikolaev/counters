@@ -3,8 +3,7 @@ package ru.ya.counters;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-import ru.ya.counters.concurrent.EventCounterOverAdder;
-import ru.ya.counters.concurrent.EventCounterOverAtomic;
+import ru.ya.counters.concurrent.WeekEventCounterOverAtomic;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -38,7 +37,7 @@ public class CounterOverAtomicTest {
 
     @Test
     public void testOfChangingMinutesQuantityOfEvents() throws InterruptedException {
-        EventCounterOverAtomic<CountedEvent> eventCounter = new EventCounterOverAtomic<>(scheduledExecutorService);
+        WeekEventCounterOverAtomic<CountedEvent> eventCounter = new WeekEventCounterOverAtomic<>(scheduledExecutorService);
         runTesters(eventCounter);
         TimeUnit.SECONDS.sleep(1);
         assert eventCounter.getQuantityOfEventsInTheLastMinute() == quantity;
@@ -50,7 +49,7 @@ public class CounterOverAtomicTest {
 
     @Test
     public void testOfChangingHourQuantityOfEvents() throws InterruptedException {
-        EventCounterOverAtomic<CountedEvent> eventCounter = new EventCounterOverAtomic<>(scheduledExecutorService);
+        WeekEventCounterOverAtomic<CountedEvent> eventCounter = new WeekEventCounterOverAtomic<>(scheduledExecutorService);
         runTesters(eventCounter);
         assert eventCounter.getQuantityOfEventsInTheLastMinute() == quantity;
         assert eventCounter.getQuantityOfEventsInTheLastHour() == quantity;

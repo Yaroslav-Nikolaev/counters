@@ -3,7 +3,7 @@ package ru.ya.counters;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-import ru.ya.counters.concurrent.EventCounterOverAdder;
+import ru.ya.counters.concurrent.WeakEventCounterOverAdder;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -37,7 +37,7 @@ public class CounterOverAdderTest {
 
     @Test
     public void testOfChangingMinutesQuantityOfEvents() throws InterruptedException {
-        EventCounterOverAdder<CountedEvent> eventCounter = new EventCounterOverAdder<>(scheduledExecutorService);
+        WeakEventCounterOverAdder<CountedEvent> eventCounter = new WeakEventCounterOverAdder<>(scheduledExecutorService);
         runTesters(eventCounter);
         TimeUnit.SECONDS.sleep(1);
         assert eventCounter.getQuantityOfEventsInTheLastMinute() == quantity;
@@ -49,7 +49,7 @@ public class CounterOverAdderTest {
 
     @Test
     public void testOfChangingHourQuantityOfEvents() throws InterruptedException {
-        EventCounterOverAdder<CountedEvent> eventCounter = new EventCounterOverAdder<>(scheduledExecutorService);
+        WeakEventCounterOverAdder<CountedEvent> eventCounter = new WeakEventCounterOverAdder<>(scheduledExecutorService);
         runTesters(eventCounter);
         assert eventCounter.getQuantityOfEventsInTheLastMinute() == quantity;
         assert eventCounter.getQuantityOfEventsInTheLastHour() == quantity;

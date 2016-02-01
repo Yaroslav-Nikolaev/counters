@@ -3,29 +3,29 @@ package ru.ya.counters.concurrent;
 import ru.ya.counters.CountedEvent;
 
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.LongAdder;
 
 /**
- * This implementation suggests that write will be more often operation than reads.
- *
+ * More accurate implementation of {@link ru.ya.counters.concurrent.WeakEventCounterOverAdder}
+ * which decrease an error in results.
  * @param <T>
  */
-public class EventCounterOverAdder<T extends CountedEvent> extends SeriesEventCounter<T> {
-    private final LongAdder counter = new LongAdder();
-
+public class EventCounterOverAdder<T extends CountedEvent> extends WeakEventCounterOverAdder<T> {
     public EventCounterOverAdder(ScheduledExecutorService executorService) {
         super(executorService);
     }
 
     @Override
-    public void countEvent(CountedEvent countedEvent) {
-        counter.increment();
+    public long getQuantityOfEventsInTheLastMinute() {
+        return super.getQuantityOfEventsInTheLastMinute() + getQuantityInThisMoment();
     }
 
+    @Override
+    public long getQuantityOfEventsInTheLastHour() {
+        return super.getQuantityOfEventsInTheLastHour() + getQuantityInThisMoment();
+    }
 
     @Override
-    protected Long getQuantityInPeriodAndReset() {
-        return counter.sumThenReset();
+    public long getQuantityOfEventsInTheLastDay() {
+        return super.getQuantityOfEventsInTheLastDay() + getQuantityInThisMoment();
     }
 }
