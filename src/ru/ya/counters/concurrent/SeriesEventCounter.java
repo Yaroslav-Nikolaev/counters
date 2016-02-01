@@ -2,6 +2,7 @@ package ru.ya.counters.concurrent;
 
 import ru.ya.counters.CountedEvent;
 import ru.ya.counters.EventCounter;
+import ru.ya.counters.LastEventMetricsHolder;
 
 import java.util.Deque;
 import java.util.concurrent.LinkedBlockingDeque;
@@ -15,7 +16,7 @@ import java.util.concurrent.TimeUnit;
  *
  * @param <T>
  */
-public abstract class SeriesEventCounter<T extends CountedEvent> implements EventCounter<T> {
+public abstract class SeriesEventCounter<T extends CountedEvent> implements EventCounter<T>, LastEventMetricsHolder {
     private final static int SINGLE_TIME_UNIT = 1;
     private final static TimeUnit DEFAULT_GRANULATION = TimeUnit.SECONDS;
     private final static int QUANTITY_OF_GRANULE = (int) TimeUnit.DAYS.toSeconds(1);

@@ -4,7 +4,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import ru.ya.counters.concurrent.EventCounterOverAdder;
-import ru.ya.counters.concurrent.EventCounterOverAtomic;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -14,7 +13,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.LongStream;
 
 @RunWith(Parameterized.class)
-public class CountedEventCounterTest {
+public class CounterOverAdderTest {
     private final static CountedEvent sample = new CountedEvent() {
     };
 
@@ -23,7 +22,7 @@ public class CountedEventCounterTest {
     private long quantity;
 
 
-    public CountedEventCounterTest(long quantity) {
+    public CounterOverAdderTest(long quantity) {
         this.quantity = quantity;
     }
 
@@ -37,8 +36,8 @@ public class CountedEventCounterTest {
     }
 
     @Test
-    public void testCountingAdder() throws InterruptedException {
-        EventCounter<CountedEvent> eventCounter = new EventCounterOverAdder<>(scheduledExecutorService);
+    public void testOfChangingMinutesQuantityOfEvents() throws InterruptedException {
+        EventCounterOverAdder<CountedEvent> eventCounter = new EventCounterOverAdder<>(scheduledExecutorService);
         runTesters(eventCounter);
         TimeUnit.SECONDS.sleep(1);
         assert eventCounter.getQuantityOfEventsInTheLastMinute() == quantity;
@@ -49,32 +48,8 @@ public class CountedEventCounterTest {
     }
 
     @Test
-    public void testCountingOverTimeAdder() throws InterruptedException {
-        EventCounter<CountedEvent> eventCounter = new EventCounterOverAdder<>(scheduledExecutorService);
-        runTesters(eventCounter);
-        assert eventCounter.getQuantityOfEventsInTheLastMinute() == quantity;
-        assert eventCounter.getQuantityOfEventsInTheLastHour() == quantity;
-        TimeUnit.MINUTES.sleep(1);
-        runTesters(eventCounter);
-        assert eventCounter.getQuantityOfEventsInTheLastMinute() == quantity;
-        assert eventCounter.getQuantityOfEventsInTheLastHour() == quantity * 2;
-    }
-
-    @Test
-    public void testCountingAtomic() throws InterruptedException {
-        EventCounter<CountedEvent> eventCounter = new EventCounterOverAtomic<>(scheduledExecutorService);
-        runTesters(eventCounter);
-        TimeUnit.SECONDS.sleep(1);
-        assert eventCounter.getQuantityOfEventsInTheLastMinute() == quantity;
-        assert eventCounter.getQuantityOfEventsInTheLastHour() == quantity;
-        TimeUnit.MINUTES.sleep(1);
-        assert eventCounter.getQuantityOfEventsInTheLastMinute() != quantity;
-        assert eventCounter.getQuantityOfEventsInTheLastHour() == quantity;
-    }
-
-    @Test
-    public void testCountingOverTimeAtomic() throws InterruptedException {
-        EventCounter<CountedEvent> eventCounter = new EventCounterOverAtomic<>(scheduledExecutorService);
+    public void testOfChangingHourQuantityOfEvents() throws InterruptedException {
+        EventCounterOverAdder<CountedEvent> eventCounter = new EventCounterOverAdder<>(scheduledExecutorService);
         runTesters(eventCounter);
         assert eventCounter.getQuantityOfEventsInTheLastMinute() == quantity;
         assert eventCounter.getQuantityOfEventsInTheLastHour() == quantity;
@@ -87,5 +62,4 @@ public class CountedEventCounterTest {
     private void runTesters(final EventCounter<CountedEvent> counter) {
         LongStream.range(0, quantity).parallel().forEach(i -> counter.countEvent(sample));
     }
-
 }
