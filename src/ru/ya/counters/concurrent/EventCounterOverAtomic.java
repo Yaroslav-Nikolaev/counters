@@ -20,7 +20,7 @@ public class EventCounterOverAtomic<T extends CountedEvent> extends SeriesEventC
     private final AtomicLong counter = new AtomicLong(0);
 
     @Override
-    protected Long getQuantityInPeriod() {
+    protected Long getQuantityInPeriodAndReset() {
         return counter.getAndSet(ZERO);
     }
 

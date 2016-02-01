@@ -25,7 +25,7 @@ public class EventCounterOverAdder<T extends CountedEvent> extends SeriesEventCo
 
 
     @Override
-    protected Long getQuantityInPeriod() {
+    protected Long getQuantityInPeriodAndReset() {
         return counter.sumThenReset();
     }
 }
