@@ -5,7 +5,7 @@ import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class TimeSeriesForSlicedValues<S> {
+class TimeSeriesForSlicedValues<S> {
     private final Deque<S> timeSeries;
     private final SlicedValue<S> slicedValue;
     private final TimeSeriesProperties timeSeriesProperties;

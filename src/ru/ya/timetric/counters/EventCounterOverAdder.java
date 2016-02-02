@@ -4,7 +4,7 @@ import ru.ya.timetric.metrics.SlicedValue;
 
 import java.util.concurrent.atomic.LongAdder;
 
-public class SlicedEventCounterOverAdder<T extends CountedEvent> implements EventCounter<T>, SlicedValue<Long> {
+public class EventCounterOverAdder<T extends CountedEvent> implements EventCounter<T>, SlicedValue<Long> {
 
     private final LongAdder counter = new LongAdder();
 

@@ -3,11 +3,12 @@ package ru.ya.timetric;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-import ru.ya.timetric.metrics.ExactLastMetricsHolder;
-import ru.ya.timetric.counters.SlicedEventCounterOverAtomic;
-import ru.ya.timetric.metrics.TimeSeriesProperties;
 import ru.ya.timetric.counters.CountedEvent;
 import ru.ya.timetric.counters.EventCounter;
+import ru.ya.timetric.counters.EventCounterOverAtomic;
+import ru.ya.timetric.metrics.HolderOfExactLastMetrics;
+import ru.ya.timetric.metrics.TimeSeriesProperties;
+import ru.ya.timetric.reducers.LongReducer;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -42,30 +43,30 @@ public class CounterOverAtomicTest {
 
     @Test
     public void testOfChangingMinutesQuantityOfEvents() throws InterruptedException {
-        SlicedEventCounterOverAtomic<CountedEvent> eventCounter = new SlicedEventCounterOverAtomic<>();
-        ExactLastMetricsHolder metricsHolder = new ExactLastMetricsHolder(timeSeriesProperties, eventCounter);
+        EventCounterOverAtomic<CountedEvent> eventCounter = new EventCounterOverAtomic<>();
+        HolderOfExactLastMetrics<Long> metricsHolder = new HolderOfExactLastMetrics<>(timeSeriesProperties, eventCounter, LongReducer.INSTANCE);
         metricsHolder.start(scheduledExecutorService);
         runTesters(eventCounter);
         TimeUnit.SECONDS.sleep(1);
-        assert metricsHolder.getQuantityOfEventsInTheLastMinute() == quantity;
-        assert metricsHolder.getQuantityOfEventsInTheLastHour() == quantity;
+        assert metricsHolder.getAccumulatedValueForTheLastMinute() == quantity;
+        assert metricsHolder.getAccumulatedValueForTheLastHour() == quantity;
         TimeUnit.MINUTES.sleep(1);
-        assert metricsHolder.getQuantityOfEventsInTheLastMinute() != quantity;
-        assert metricsHolder.getQuantityOfEventsInTheLastHour() == quantity;
+        assert metricsHolder.getAccumulatedValueForTheLastMinute() != quantity;
+        assert metricsHolder.getAccumulatedValueForTheLastHour() == quantity;
     }
 
     @Test
     public void testOfChangingHourQuantityOfEvents() throws InterruptedException {
-        SlicedEventCounterOverAtomic<CountedEvent> eventCounter = new SlicedEventCounterOverAtomic<>();
-        ExactLastMetricsHolder metricsHolder = new ExactLastMetricsHolder(timeSeriesProperties, eventCounter);
+        EventCounterOverAtomic<CountedEvent> eventCounter = new EventCounterOverAtomic<>();
+        HolderOfExactLastMetrics<Long> metricsHolder = new HolderOfExactLastMetrics<>(timeSeriesProperties, eventCounter, LongReducer.INSTANCE);
         metricsHolder.start(scheduledExecutorService);
         runTesters(eventCounter);
-        assert metricsHolder.getQuantityOfEventsInTheLastMinute() == quantity;
-        assert metricsHolder.getQuantityOfEventsInTheLastHour() == quantity;
+        assert metricsHolder.getAccumulatedValueForTheLastMinute() == quantity;
+        assert metricsHolder.getAccumulatedValueForTheLastHour() == quantity;
         TimeUnit.MINUTES.sleep(1);
         runTesters(eventCounter);
-        assert metricsHolder.getQuantityOfEventsInTheLastMinute() == quantity;
-        assert metricsHolder.getQuantityOfEventsInTheLastHour() == quantity * 2;
+        assert metricsHolder.getAccumulatedValueForTheLastMinute() == quantity;
+        assert metricsHolder.getAccumulatedValueForTheLastHour() == quantity * 2;
     }
 
     private void runTesters(final EventCounter<CountedEvent> counter) {

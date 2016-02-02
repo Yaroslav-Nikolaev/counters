@@ -6,7 +6,7 @@ import org.openjdk.jmh.annotations.Mode;
 import org.openjdk.jmh.annotations.OutputTimeUnit;
 import ru.ya.timetric.counters.CountedEvent;
 import ru.ya.timetric.counters.EventCounter;
-import ru.ya.timetric.counters.SlicedEventCounterOverAdder;
+import ru.ya.timetric.counters.EventCounterOverAdder;
 
 import java.util.concurrent.TimeUnit;
 import java.util.stream.IntStream;
@@ -16,8 +16,8 @@ public class BenchMark {
     };
     private final static int EVENTS_NUMBER = Integer.MAX_VALUE;
 
-    private final static EventCounter<CountedEvent> ATOMIC_EVENT_COUNTER = new SlicedEventCounterOverAdder<>();
-    private final static EventCounter<CountedEvent> ADDER_EVENT_COUNTER = new SlicedEventCounterOverAdder<>();
+    private final static EventCounter<CountedEvent> ATOMIC_EVENT_COUNTER = new EventCounterOverAdder<>();
+    private final static EventCounter<CountedEvent> ADDER_EVENT_COUNTER = new EventCounterOverAdder<>();
 
     @Benchmark
     @BenchmarkMode(Mode.AverageTime)
