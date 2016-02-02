@@ -1,16 +1,13 @@
-package ru.ya.counters.benchmarks;
+package ru.ya.timetric.benchmarks;
 
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
 import org.openjdk.jmh.annotations.Mode;
 import org.openjdk.jmh.annotations.OutputTimeUnit;
-import ru.ya.counters.CountedEvent;
-import ru.ya.counters.EventCounter;
-import ru.ya.counters.concurrent.WeakEventCounterOverAdder;
-import ru.ya.counters.concurrent.WeekEventCounterOverAtomic;
+import ru.ya.timetric.counters.CountedEvent;
+import ru.ya.timetric.counters.EventCounter;
+import ru.ya.timetric.counters.SlicedEventCounterOverAdder;
 
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.IntStream;
 
@@ -19,9 +16,8 @@ public class BenchMark {
     };
     private final static int EVENTS_NUMBER = Integer.MAX_VALUE;
 
-    private final static ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
-    private final static EventCounter<CountedEvent> ATOMIC_EVENT_COUNTER = new WeekEventCounterOverAtomic<>(scheduledExecutorService);
-    private final static EventCounter<CountedEvent> ADDER_EVENT_COUNTER = new WeakEventCounterOverAdder<>(scheduledExecutorService);
+    private final static EventCounter<CountedEvent> ATOMIC_EVENT_COUNTER = new SlicedEventCounterOverAdder<>();
+    private final static EventCounter<CountedEvent> ADDER_EVENT_COUNTER = new SlicedEventCounterOverAdder<>();
 
     @Benchmark
     @BenchmarkMode(Mode.AverageTime)

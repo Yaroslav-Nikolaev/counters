@@ -1,4 +1,4 @@
-package ru.ya.counters;
+package ru.ya.timetric.metrics;
 
 public interface LastEventMetricsHolder {
 
