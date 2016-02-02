@@ -3,7 +3,7 @@ package ru.ya.timetric.reducers;
 import java.util.function.BiFunction;
 import java.util.function.BinaryOperator;
 
-public class LongReducer extends Reducer<Long, Long> {
+public class LongReducer extends Reducer<Long> {
 
     public static final LongReducer INSTANCE = new LongReducer();
     private static final Long IDENTITY = 0l;

@@ -3,12 +3,12 @@ package ru.ya.timetric.reducers;
 import java.util.function.BiFunction;
 import java.util.function.BinaryOperator;
 
-public abstract class Reducer<U, T> {
+public abstract class Reducer<U> {
     private final U identity;
     private final BinaryOperator<U> combiner;
-    private final BiFunction<U, ? super T, U> accumulator;
+    private final BiFunction<U, ? super U, U> accumulator;
 
-    public Reducer(U identity, BinaryOperator<U> combiner, BiFunction<U, ? super T, U> accumulator) {
+    public Reducer(U identity, BinaryOperator<U> combiner, BiFunction<U, ? super U, U> accumulator) {
         this.identity = identity;
         this.combiner = combiner;
         this.accumulator = accumulator;
@@ -24,7 +24,7 @@ public abstract class Reducer<U, T> {
         return combiner;
     }
 
-    public BiFunction<U, ? super T, U> getAccumulator() {
+    public BiFunction<U, ? super U, U> getAccumulator() {
         return accumulator;
     }
 }

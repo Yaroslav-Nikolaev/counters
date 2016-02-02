@@ -16,13 +16,21 @@ import java.util.function.BinaryOperator;
 public class HolderOfInexactLastMetrics<S> extends TimeSeriesForSlicedValues<S> implements LastMetricsOfTimeSeries<S> {
     private final static int SINGLE_TIME_UNIT = 1;
 
-    private final Reducer<S, S> reducer;
+    private final Reducer<S> reducer;
 
     private volatile S quantityOfEventsInTheLastMinute;
     private volatile S quantityOfEventsInTheLastHour;
     private volatile S quantityOfEventsInTheLastDay;
 
-    public HolderOfInexactLastMetrics(TimeSeriesProperties timeSeriesProperties, SlicedValue<S> slicedValue, Reducer<S, S> reducer) {
+    //todo implement flexible time series properties
+    private final static TimeSeriesProperties DEFAULT_TIME_SERIES_PROPERTIES = new TimeSeriesProperties((int) TimeUnit.DAYS.toSeconds(1), 1, TimeUnit.SECONDS);
+
+    public HolderOfInexactLastMetrics(SlicedValue<S> slicedValue, Reducer<S> reducer) {
+        super(DEFAULT_TIME_SERIES_PROPERTIES, slicedValue);
+        this.reducer = reducer;
+    }
+
+    private HolderOfInexactLastMetrics(TimeSeriesProperties timeSeriesProperties, SlicedValue<S> slicedValue, Reducer<S> reducer) {
         super(timeSeriesProperties, slicedValue);
         this.reducer = reducer;
     }
@@ -30,12 +38,14 @@ public class HolderOfInexactLastMetrics<S> extends TimeSeriesForSlicedValues<S> 
     @Override
     protected void addToSeries(S quantityOfEventsInInterval) {
         super.addToSeries(quantityOfEventsInInterval);
-        quantityOfEventsInTheLastMinute = getQuantityOfEventsInTheLastInterval(TimeUnit.MINUTES, SINGLE_TIME_UNIT);
-        quantityOfEventsInTheLastHour = getQuantityOfEventsInTheLastInterval(TimeUnit.HOURS, SINGLE_TIME_UNIT);
-        quantityOfEventsInTheLastDay = getQuantityOfEventsInTheLastInterval(TimeUnit.DAYS, SINGLE_TIME_UNIT);
+        quantityOfEventsInTheLastMinute = getAccumulatedValueForTheLastInterval(TimeUnit.MINUTES, SINGLE_TIME_UNIT);
+        quantityOfEventsInTheLastHour = getAccumulatedValueForTheLastInterval(TimeUnit.HOURS, SINGLE_TIME_UNIT);
+        quantityOfEventsInTheLastDay = getAccumulatedValueForTheLastInterval(TimeUnit.DAYS, SINGLE_TIME_UNIT);
     }
 
-    S getQuantityOfEventsInTheLastInterval(TimeUnit unit, int interval) {
+    //todo write one more abstaction which will hide an wrapper functions over streams.
+    S getAccumulatedValueForTheLastInterval(TimeUnit unit, int interval) {
+        //todo rewrite when will be rewriten DEFAULT_TIME_SERIES_PROPERTIES -> do it in TimeSeriesForSlicedValues!
         long historyLength = unit.toSeconds(interval);
         S identity = reducer.getIdentityClone();
         BinaryOperator<S> combiner = reducer.getCombiner();
@@ -58,7 +68,7 @@ public class HolderOfInexactLastMetrics<S> extends TimeSeriesForSlicedValues<S> 
         return quantityOfEventsInTheLastDay;
     }
 
-    protected Reducer<S, S> getReducer() {
+    protected Reducer<S> getReducer() {
         return reducer;
     }
 }

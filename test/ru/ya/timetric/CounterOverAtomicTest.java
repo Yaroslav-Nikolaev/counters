@@ -7,7 +7,6 @@ import ru.ya.timetric.counters.CountedEvent;
 import ru.ya.timetric.counters.EventCounter;
 import ru.ya.timetric.counters.EventCounterOverAtomic;
 import ru.ya.timetric.metrics.HolderOfExactLastMetrics;
-import ru.ya.timetric.metrics.TimeSeriesProperties;
 import ru.ya.timetric.reducers.LongReducer;
 
 import java.util.Arrays;
@@ -23,7 +22,6 @@ public class CounterOverAtomicTest {
     };
 
     private ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
-    private TimeSeriesProperties timeSeriesProperties = new TimeSeriesProperties((int) TimeUnit.DAYS.toSeconds(1), 1, TimeUnit.SECONDS);
 
     private long quantity;
 
@@ -44,7 +42,7 @@ public class CounterOverAtomicTest {
     @Test
     public void testOfChangingMinutesQuantityOfEvents() throws InterruptedException {
         EventCounterOverAtomic<CountedEvent> eventCounter = new EventCounterOverAtomic<>();
-        HolderOfExactLastMetrics<Long> metricsHolder = new HolderOfExactLastMetrics<>(timeSeriesProperties, eventCounter, LongReducer.INSTANCE);
+        HolderOfExactLastMetrics<Long> metricsHolder = new HolderOfExactLastMetrics<>(eventCounter, LongReducer.INSTANCE);
         metricsHolder.start(scheduledExecutorService);
         runTesters(eventCounter);
         TimeUnit.SECONDS.sleep(1);
@@ -58,7 +56,7 @@ public class CounterOverAtomicTest {
     @Test
     public void testOfChangingHourQuantityOfEvents() throws InterruptedException {
         EventCounterOverAtomic<CountedEvent> eventCounter = new EventCounterOverAtomic<>();
-        HolderOfExactLastMetrics<Long> metricsHolder = new HolderOfExactLastMetrics<>(timeSeriesProperties, eventCounter, LongReducer.INSTANCE);
+        HolderOfExactLastMetrics<Long> metricsHolder = new HolderOfExactLastMetrics<>(eventCounter, LongReducer.INSTANCE);
         metricsHolder.start(scheduledExecutorService);
         runTesters(eventCounter);
         assert metricsHolder.getAccumulatedValueForTheLastMinute() == quantity;

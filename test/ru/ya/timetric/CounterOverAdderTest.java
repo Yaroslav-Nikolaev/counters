@@ -23,7 +23,6 @@ public class CounterOverAdderTest {
     };
 
     private ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
-    private TimeSeriesProperties timeSeriesProperties = new TimeSeriesProperties((int) TimeUnit.DAYS.toSeconds(1), 1, TimeUnit.SECONDS);
 
     private long quantity;
 
@@ -44,7 +43,7 @@ public class CounterOverAdderTest {
     @Test
     public void testOfChangingMinutesQuantityOfEvents() throws InterruptedException {
         EventCounterOverAdder<CountedEvent> eventCounter = new EventCounterOverAdder<>();
-        HolderOfExactLastMetrics<Long> metricsHolder = new HolderOfExactLastMetrics<>(timeSeriesProperties, eventCounter, LongReducer.INSTANCE);
+        HolderOfExactLastMetrics<Long> metricsHolder = new HolderOfExactLastMetrics<>( eventCounter, LongReducer.INSTANCE);
         metricsHolder.start(scheduledExecutorService);
         runTesters(eventCounter);
         TimeUnit.SECONDS.sleep(1);
@@ -58,7 +57,7 @@ public class CounterOverAdderTest {
     @Test
     public void testOfChangingHourQuantityOfEvents() throws InterruptedException {
         EventCounterOverAdder<CountedEvent> eventCounter = new EventCounterOverAdder<>();
-        HolderOfExactLastMetrics<Long> metricsHolder = new HolderOfExactLastMetrics<>(timeSeriesProperties, eventCounter, LongReducer.INSTANCE);
+        HolderOfExactLastMetrics<Long> metricsHolder = new HolderOfExactLastMetrics<>(eventCounter, LongReducer.INSTANCE);
         metricsHolder.start(scheduledExecutorService);
         runTesters(eventCounter);
         assert metricsHolder.getAccumulatedValueForTheLastMinute() == quantity;

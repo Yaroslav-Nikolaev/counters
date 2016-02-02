@@ -5,6 +5,8 @@ import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+//todo create new one abstraction which will hide time series implementation!
+//todo try implementations with EvictingQueue (guava) and  CircularFifoBuffer(apache)
 class TimeSeriesForSlicedValues<S> {
     private final Deque<S> timeSeries;
     private final SlicedValue<S> slicedValue;
